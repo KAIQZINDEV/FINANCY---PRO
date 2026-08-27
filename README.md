@@ -1,10 +1,10 @@
 # ⚡ FINANCY PRO — Terminal Financeiro & Gestão de Produtos
 
 ![Status do Projeto](https://img.shields.io/badge/STATUS-ATIVO-00E5C7?style=for-the-badge)
-![Tecnologia](https://img.shields.io/badge/STACK-HTML5%20%7C%20CSS3%20%7C%20%20%7C%20-101A26?style=for-the-badge)
+![Tecnologia](https://img.shields.io/badge/STACK-HTML5%20%7C%20CSS3%20-101A26?style=for-the-badge)
 ![UI Concept](https://img.shields.io/badge/DESIGN-HUD%20TERMINAL-FFB020?style=for-the-badge)
 
-O **FINANCY PRO** é um painel de gestão financeira e controle de estoque de alta performance. Inspirado em terminais profissionais de mercado, o sistema combina um design em estilo **HUD/Cyberpunk Sóbrio** com processamento de dados em tempo real utilizando o Google Firebase[cite: 3, 4].
+O **FINANCY PRO** é um painel de gestão financeira e controle de estoque de alta performance. Inspirado em terminais profissionais de mercado.
 
 ---
 
@@ -33,15 +33,3 @@ O **FINANCY PRO** é um painel de gestão financeira e controle de estoque de al
 
 
 ---
-
-## 🚀 Como Executar o Projeto
-
-### Pró-requisitos
-Apenas um navegador web moderno e uma conta no Google Firebase.
-
-### Passo a Passo
-
-1. **Clonar o Repositório**
-   ```bash
-   git clone [https://github.com/seu-usuario/financy-pro.git](https://github.com/seu-usuario/financy-pro.git)
-   cd financy-pro
