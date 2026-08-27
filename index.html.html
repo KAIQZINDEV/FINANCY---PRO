@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINANCPROK — Terminal Financeiro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="financprok.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <!-- ===================== TOPO ===================== -->
+    <header class="topbar">
+        <div class="brand">
+            <span class="dot-pulse"></span>
+            FINANCY <span class="pro-tag">PRO</span>
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" id="nav-dashboard" onclick="mudarView('dashboard')">
+                <i class="fa-solid fa-chart-line"></i> Dashboard
+            </button>
+            <button class="nav-tab" id="nav-produtos" onclick="mudarView('produtos')">
+                <i class="fa-solid fa-box-open"></i> Produtos
+            </button>
+        </nav>
+
+        <div class="context-toggle">
+            <button class="context-btn active pessoal" id="btn-pessoal" onclick="mudarContexto('pessoal')">
+                <i class="fa-solid fa-user"></i> Pessoal
+            </button>
+            <button class="context-btn empresa" id="btn-empresa" onclick="mudarContexto('empresa')">
+                <i class="fa-solid fa-briefcase"></i> Empresa
+            </button>
+        </div>
+
+        
+    </header>
+
+    <!-- ===================== TICKER ===================== -->
+    <div class="ticker-wrap">
+        <div class="ticker-track" id="ticker-track">
+            <!-- duplicado via JS para loop contínuo -->
+        </div>
+    </div>
+
+    <main class="main-content">
+
+        <!-- ===================== VIEW: DASHBOARD ===================== -->
+        <section id="view-dashboard" class="view active">
+
+            <div class="view-title">
+                <h1 id="titulo-contexto">Painel Pessoal</h1>
+                <p>// visão geral em tempo real</p>
+            </div>
+
+            <section class="stat-grid">
+                <div class="panel stat-panel receita">
+                    <div class="stat-head">
+                        <span class="stat-label">Receitas</span>
+                        <div class="stat-icon"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                    </div>
+                    <div class="stat-value tabular" id="total-receitas">R$ 0,00</div>
+                </div>
+                <div class="panel stat-panel despesa">
+                    <div class="stat-head">
+                        <span class="stat-label">Despesas</span>
+                        <div class="stat-icon"><i class="fa-solid fa-arrow-trend-down"></i></div>
+                    </div>
+                    <div class="stat-value tabular" id="total-despesas">R$ 0,00</div>
+                </div>
+                <div class="panel stat-panel saldo">
+                    <div class="stat-head">
+                        <span class="stat-label">Saldo Líquido</span>
+                        <div class="stat-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+                    </div>
+                    <div class="stat-value tabular" id="saldo-liquido">R$ 0,00</div>
+                </div>
+            </section>
+
+            <section class="panel form-panel">
+                <h3><i class="fa-solid fa-terminal"></i> Novo Lançamento <span class="ctx-label">// <span id="form-contexto-label">pessoal</span></span></h3>
+                <form id="finance-form" class="form-row">
+                    <div class="f-group">
+                        <label for="desc">Descrição</label>
+                        <input type="text" id="desc" placeholder="Ex: Salário ou Venda" required>
+                    </div>
+                    <div class="f-group">
+                        <label for="tipo">Tipo</label>
+                        <select id="tipo" required>
+                            <option value="receita">Receita (+)</option>
+                            <option value="despesa">Despesa (-)</option>
+                        </select>
+                    </div>
+                    <div class="f-group">
+                        <label for="mes">Mês</label>
+                        <select id="mes" required>
+                            <option value="Janeiro">Janeiro</option><option value="Fevereiro">Fevereiro</option>
+                            <option value="Março">Março</option><option value="Abril">Abril</option>
+                            <option value="Maio">Maio</option><option value="Junho">Junho</option>
+                            <option value="Julho">Julho</option><option value="Agosto">Agosto</option>
+                            <option value="Setembro">Setembro</option><option value="Outubro">Outubro</option>
+                            <option value="Novembro">Novembro</option><option value="Dezembro">Dezembro</option>
+                        </select>
+                    </div>
+                    <div class="f-group">
+                        <label for="valor">Valor (R$)</label>
+                        <input type="number" id="valor" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <button type="submit" class="btn-exec">EXECUTAR &gt;</button>
+                </form>
+            </section>
+
+            <section class="chart-grid">
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>Evolução Mensal</h3>
+                        <div class="seg-tabs">
+                            <button class="seg-tab active" id="tab-bar" onclick="alternarTipoGrafico('bar')">BARRAS</button>
+                            <button class="seg-tab" id="tab-line" onclick="alternarTipoGrafico('line')">LINHA</button>
+                        </div>
+                    </div>
+                    <div class="chart-canvas-wrap"><canvas id="graficoMensal"></canvas></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head"><h3>Distribuição</h3></div>
+                    <div class="chart-canvas-wrap small"><canvas id="graficoDistribuicao"></canvas></div>
+                    <div class="dist-legend">
+                        <div class="dist-row"><span><span class="sq" style="background:#35d07f"></span>Receitas</span><strong id="dist-receitas">0%</strong></div>
+                        <div class="dist-row"><span><span class="sq" style="background:#ff4d6d"></span>Despesas</span><strong id="dist-despesas">0%</strong></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head"><h3>Últimos Lançamentos</h3></div>
+                <div class="table-scroll">
+                    <table class="grid-table">
+                        <thead><tr><th>Mês</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+
+        <!-- ===================== VIEW: PRODUTOS ===================== -->
+        <section id="view-produtos" class="view">
+
+            <div class="view-title">
+                <h1>Produtos <span id="produtos-contexto-label" style="color:var(--signal-mint); font-family: var(--font-mono); font-size: 1rem;">// pessoal</span></h1>
+                <p>// controle de catálogo e estoque</p>
+            </div>
+
+            <section class="stat-grid">
+                <div class="panel stat-panel produtos">
+                    <div class="stat-head">
+                        <span class="stat-label">Total de Produtos</span>
+                        <div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+                    </div>
+                    <div class="stat-value tabular" id="total-produtos">0</div>
+                </div>
+                <div class="panel stat-panel estoque">
+                    <div class="stat-head">
+                        <span class="stat-label">Valor em Estoque</span>
+                        <div class="stat-icon"><i class="fa-solid fa-warehouse"></i></div>
+                    </div>
+                    <div class="stat-value tabular" id="valor-estoque">R$ 0,00</div>
+                </div>
+                <div class="panel stat-panel baixo">
+                    <div class="stat-head">
+                        <span class="stat-label">Estoque Baixo (&lt;5un)</span>
+                        <div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    </div>
+                    <div class="stat-value tabular" id="produtos-baixo">0</div>
+                </div>
+            </section>
+
+            <section class="panel form-panel">
+                <h3><i class="fa-solid fa-tag"></i> Cadastrar Produto <span class="ctx-label">// <span id="produto-form-contexto">pessoal</span></span></h3>
+                <form id="produto-form" class="form-row">
+                    <div class="f-group">
+                        <label for="produto-nome">Nome do Produto</label>
+                        <input type="text" id="produto-nome" placeholder="Ex: Mouse sem fio" required>
+                    </div>
+                    <div class="f-group">
+                        <label for="produto-categoria">Categoria</label>
+                        <select id="produto-categoria" required>
+                            <option value="Eletrônicos">Eletrônicos</option>
+                            <option value="Vestuário">Vestuário</option>
+                            <option value="Alimentos">Alimentos</option>
+                            <option value="Serviços">Serviços</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div class="f-group">
+                        <label for="produto-preco">Preço (R$)</label>
+                        <input type="number" id="produto-preco" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="f-group">
+                        <label for="produto-estoque">Qtd. em Estoque</label>
+                        <input type="number" id="produto-estoque" step="1" min="0" placeholder="0" required>
+                    </div>
+                    <button type="submit" class="btn-exec amber">CADASTRAR &gt;</button>
+                </form>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head"><h3>Produtos Cadastrados</h3></div>
+                <div class="table-scroll">
+                    <table class="grid-table">
+                        <thead><tr><th>Produto</th><th>Categoria</th><th>Preço</th><th>Estoque</th><th>Total</th><th></th></tr></thead>
+                        <tbody id="produtos-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+
+    </main>
+
+    <script>
+        // =========================================================
+        // NAVEGAÇÃO ENTRE VIEWS
+        // =========================================================
+        window.mudarView = function(view) {
+            document.getElementById('view-dashboard').classList.toggle('active', view === 'dashboard');
+            document.getElementById('view-produtos').classList.toggle('active', view === 'produtos');
+            document.getElementById('nav-dashboard').classList.toggle('active', view === 'dashboard');
+            document.getElementById('nav-produtos').classList.toggle('active', view === 'produtos');
+        }
+
+        // =========================================================
+        // TICKER — atualizado a cada snapshot do Firestore
+        // =========================================================
+        function atualizarTicker(receitas, despesas, saldo, totalProdutos, valorEstoque) {
+            const itens = [
+                { lbl: 'RECEITAS', val: `R$ ${receitas.toFixed(2)}`, cls: 'up', icon: 'fa-arrow-up' },
+                { lbl: 'DESPESAS', val: `R$ ${despesas.toFixed(2)}`, cls: 'down', icon: 'fa-arrow-down' },
+                { lbl: 'SALDO', val: `R$ ${saldo.toFixed(2)}`, cls: saldo >= 0 ? 'up' : 'down', icon: 'fa-scale-balanced' },
+                { lbl: 'PRODUTOS', val: `${totalProdutos}`, cls: '', icon: 'fa-box' },
+                { lbl: 'ESTOQUE', val: `R$ ${valorEstoque.toFixed(2)}`, cls: '', icon: 'fa-warehouse' },
+            ];
+            const montaBloco = () => itens.map(i => `
+                <div class="ticker-item"><i class="fa-solid ${i.icon}"></i><span class="lbl">${i.lbl}</span><span class="val ${i.cls}">${i.val}</span></div>
+            `).join('');
+            // duplicado 2x para permitir loop contínuo do CSS (translateX -50%)
+            document.getElementById('ticker-track').innerHTML = montaBloco() + montaBloco();
+        }
+        atualizarTicker(0, 0, 0, 0, 0);
+
+        // =========================================================
+        // GRÁFICOS (Chart.js)
+        // =========================================================
+        let meuGrafico, graficoDistribuicao;
+        let tipoGraficoAtual = 'bar';
+        const ctx = document.getElementById('graficoMensal').getContext('2d');
+        const ctxDist = document.getElementById('graficoDistribuicao').getContext('2d');
+        const mesesLabels = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+        let ultimosDadosReceitas = Array(12).fill(0);
+        let ultimosDadosDespesas = Array(12).fill(0);
+
+        function criarGradiente(ctx, corTopo, corBase) {
+            const g = ctx.createLinearGradient(0, 0, 0, 300);
+            g.addColorStop(0, corTopo);
+            g.addColorStop(1, corBase);
+            return g;
+        }
+
+        function renderizarGrafico(dadosReceitas, dadosDespesas) {
+            ultimosDadosReceitas = dadosReceitas;
+            ultimosDadosDespesas = dadosDespesas;
+            if (meuGrafico) meuGrafico.destroy();
+
+            const gradReceita = criarGradiente(ctx, 'rgba(53, 208, 127, 0.9)', 'rgba(53, 208, 127, 0.1)');
+            const gradDespesa = criarGradiente(ctx, 'rgba(255, 77, 109, 0.9)', 'rgba(255, 77, 109, 0.1)');
+
+            meuGrafico = new Chart(ctx, {
+                type: tipoGraficoAtual,
+                data: {
+                    labels: mesesLabels,
+                    datasets: [
+                        {
+                            label: 'Receitas', data: dadosReceitas,
+                            backgroundColor: tipoGraficoAtual === 'bar' ? gradReceita : 'rgba(53,208,127,0.12)',
+                            borderColor: '#35d07f', borderWidth: tipoGraficoAtual === 'line' ? 2.5 : 0,
+                            borderRadius: tipoGraficoAtual === 'bar' ? 3 : 0, tension: 0.3,
+                            fill: tipoGraficoAtual === 'line', pointRadius: tipoGraficoAtual === 'line' ? 3 : 0,
+                            pointBackgroundColor: '#35d07f', maxBarThickness: 24
+                        },
+                        {
+                            label: 'Despesas', data: dadosDespesas,
+                            backgroundColor: tipoGraficoAtual === 'bar' ? gradDespesa : 'rgba(255,77,109,0.12)',
+                            borderColor: '#ff4d6d', borderWidth: tipoGraficoAtual === 'line' ? 2.5 : 0,
+                            borderRadius: tipoGraficoAtual === 'bar' ? 3 : 0, tension: 0.3,
+                            fill: tipoGraficoAtual === 'line', pointRadius: tipoGraficoAtual === 'line' ? 3 : 0,
+                            pointBackgroundColor: '#ff4d6d', maxBarThickness: 24
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: { labels: { color: '#e8f1f5', usePointStyle: true, boxWidth: 8, font: { family: 'JetBrains Mono', size: 11 } } },
+                        tooltip: {
+                            backgroundColor: '#0e1620', borderColor: 'rgba(0,229,199,0.2)', borderWidth: 1,
+                            titleColor: '#e8f1f5', bodyColor: '#7c8ea1', padding: 10, cornerRadius: 4,
+                            titleFont: { family: 'JetBrains Mono' }, bodyFont: { family: 'JetBrains Mono' },
+                            callbacks: { label: (item) => `${item.dataset.label}: R$ ${item.parsed.y.toFixed(2)}` }
+                        }
+                    },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#3f4d5e', font: { family: 'JetBrains Mono', size: 10 } } },
+                        x: { grid: { display: false }, ticks: { color: '#3f4d5e', font: { family: 'JetBrains Mono', size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        window.alternarTipoGrafico = function(tipo) {
+            tipoGraficoAtual = tipo;
+            document.getElementById('tab-bar').classList.toggle('active', tipo === 'bar');
+            document.getElementById('tab-line').classList.toggle('active', tipo === 'line');
+            renderizarGrafico(ultimosDadosReceitas, ultimosDadosDespesas);
+        }
+
+        function renderizarDistribuicao(totalReceitas, totalDespesas) {
+            if (graficoDistribuicao) graficoDistribuicao.destroy();
+            const soma = totalReceitas + totalDespesas;
+            const pctR = soma > 0 ? Math.round((totalReceitas / soma) * 100) : 0;
+            const pctD = soma > 0 ? 100 - pctR : 0;
+            document.getElementById('dist-receitas').innerText = pctR + '%';
+            document.getElementById('dist-despesas').innerText = pctD + '%';
+
+            graficoDistribuicao = new Chart(ctxDist, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Receitas', 'Despesas'],
+                    datasets: [{
+                        data: soma > 0 ? [totalReceitas, totalDespesas] : [1, 1],
+                        backgroundColor: soma > 0 ? ['#35d07f', '#ff4d6d'] : ['#101a26', '#101a26'],
+                        borderWidth: 0, hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '74%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: soma > 0, backgroundColor: '#0e1620', borderColor: 'rgba(0,229,199,0.2)', borderWidth: 1,
+                            titleColor: '#e8f1f5', bodyColor: '#7c8ea1', padding: 10, cornerRadius: 4,
+                            bodyFont: { family: 'JetBrains Mono' }, titleFont: { family: 'JetBrains Mono' },
+                            callbacks: { label: (item) => `${item.label}: R$ ${item.parsed.toFixed(2)}` }
+                        }
+                    }
+                }
+            });
+        }
+
+        renderizarGrafico(Array(12).fill(0), Array(12).fill(0));
+        renderizarDistribuicao(0, 0);
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // ⚠️ INSIRA SUAS CHAVES DO FIREBASE AQUI
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_AUTH_DOMAIN",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_STORAGE_BUCKET",
+            messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const transacoesRef = collection(db, "transacoes");
+        const produtosRef = collection(db, "produtos");
+
+        let contextoAtual = 'pessoal';
+        let unsubscribeTransacoes, unsubscribeProdutos;
+        let totaisAtuais = { receitas: 0, despesas: 0, produtos: 0, estoque: 0 };
+
+        // =========================================================
+        // CONTEXTO
+        // =========================================================
+        window.mudarContexto = function(novoContexto) {
+            contextoAtual = novoContexto;
+            document.getElementById('btn-pessoal').classList.toggle('active', novoContexto === 'pessoal');
+            document.getElementById('btn-empresa').classList.toggle('active', novoContexto === 'empresa');
+
+            const rotulo = novoContexto;
+            document.getElementById('titulo-contexto').innerText = novoContexto === 'pessoal' ? 'Painel Pessoal' : 'Painel Empresarial';
+            document.getElementById('form-contexto-label').innerText = rotulo;
+            document.getElementById('produtos-contexto-label').innerText = `// ${rotulo}`;
+            document.getElementById('produto-form-contexto').innerText = rotulo;
+
+            conectarBancoRealtime();
+            conectarProdutos();
+        }
+
+        // =========================================================
+        // TRANSAÇÕES
+        // =========================================================
+        function conectarBancoRealtime() {
+            if (unsubscribeTransacoes) unsubscribeTransacoes();
+            document.getElementById('status-sync').innerText = "🔄 sincronizando...";
+
+            const q = query(transacoesRef, where("contexto", "==", contextoAtual), orderBy("criadoEm", "asc"));
+
+            unsubscribeTransacoes = onSnapshot(q, (snapshot) => {
+                const tableBody = document.getElementById('table-body');
+                tableBody.innerHTML = '';
+
+                let receitasTotais = 0, despesasTotais = 0;
+                let receitasPorMes = Array(12).fill(0), despesasPorMes = Array(12).fill(0);
+                const mesesLista = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+                if (snapshot.empty) {
+                    tableBody.innerHTML = `<tr><td colspan="4"><div class="empty-row"><i class="fa-solid fa-inbox"></i>nenhum lançamento registrado</div></td></tr>`;
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const t = docSnap.data();
+                    const id = docSnap.id;
+                    const valorNumerico = parseFloat(t.valor) || 0;
+                    const indexMes = mesesLista.indexOf(t.mes);
+
+                    if (t.tipo === 'receita') {
+                        receitasTotais += valorNumerico;
+                        if (indexMes !== -1) receitasPorMes[indexMes] += valorNumerico;
+                    } else {
+                        despesasTotais += valorNumerico;
+                        if (indexMes !== -1) despesasPorMes[indexMes] += valorNumerico;
+                    }
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${t.mes}</td>
+                        <td>${t.descricao}</td>
+                        <td class="${t.tipo === 'receita' ? 'v-up' : 'v-down'}">R$ ${valorNumerico.toFixed(2)}</td>
+                        <td><button class="btn-del" data-id="${id}"><i class="fa-solid fa-trash"></i></button></td>
+                    `;
+                    tableBody.prepend(tr);
+                });
+
+                const saldo = receitasTotais - despesasTotais;
+                document.getElementById('total-receitas').innerText = `R$ ${receitasTotais.toFixed(2)}`;
+                document.getElementById('total-despesas').innerText = `R$ ${despesasTotais.toFixed(2)}`;
+                document.getElementById('saldo-liquido').innerText = `R$ ${saldo.toFixed(2)}`;
+                document.getElementById('saldo-liquido').style.color = saldo >= 0 ? '#35d07f' : '#ff4d6d';
+
+                renderizarGrafico(receitasPorMes, despesasPorMes);
+                renderizarDistribuicao(receitasTotais, despesasTotais);
+
+                totaisAtuais.receitas = receitasTotais;
+                totaisAtuais.despesas = despesasTotais;
+                atualizarTicker(totaisAtuais.receitas, totaisAtuais.despesas, saldo, totaisAtuais.produtos, totaisAtuais.estoque);
+
+                document.getElementById('status-sync').innerText = "☁️ sincronizado";
+
+                document.querySelectorAll('.btn-del[data-id]').forEach(btn => {
+                    btn.onclick = async () => { await deleteDoc(doc(db, "transacoes", btn.getAttribute('data-id'))); };
+                });
+            }, (error) => {
+                console.error("Erro no banco:", error);
+                document.getElementById('status-sync').innerText = "⚠️ erro de índices (aguarde)";
+            });
+        }
+
+        document.getElementById('finance-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await addDoc(transacoesRef, {
+                descricao: document.getElementById('desc').value,
+                tipo: document.getElementById('tipo').value,
+                mes: document.getElementById('mes').value,
+                valor: document.getElementById('valor').value,
+                contexto: contextoAtual,
+                criadoEm: new Date()
+            });
+            document.getElementById('finance-form').reset();
+        });
+
+        // =========================================================
+        // PRODUTOS
+        // =========================================================
+        function conectarProdutos() {
+            if (unsubscribeProdutos) unsubscribeProdutos();
+
+            const q = query(produtosRef, where("contexto", "==", contextoAtual), orderBy("criadoEm", "asc"));
+
+            unsubscribeProdutos = onSnapshot(q, (snapshot) => {
+                const tableBody = document.getElementById('produtos-table-body');
+                tableBody.innerHTML = '';
+
+                let totalProdutos = 0, valorEstoque = 0, estoqueBaixo = 0;
+
+                if (snapshot.empty) {
+                    tableBody.innerHTML = `<tr><td colspan="6"><div class="empty-row"><i class="fa-solid fa-box-open"></i>nenhum produto cadastrado</div></td></tr>`;
+                }
+
+                snapshot.forEach((docSnap) => {
+                    const p = docSnap.data();
+                    const id = docSnap.id;
+                    const preco = parseFloat(p.preco) || 0;
+                    const estoque = parseInt(p.estoque) || 0;
+                    const valorTotal = preco * estoque;
+
+                    totalProdutos += 1;
+                    valorEstoque += valorTotal;
+                    if (estoque < 5) estoqueBaixo += 1;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${p.nome}</td>
+                        <td><span class="chip">${p.categoria}</span></td>
+                        <td>R$ ${preco.toFixed(2)}</td>
+                        <td class="${estoque < 5 ? 'v-low' : ''}">${estoque} un</td>
+                        <td>R$ ${valorTotal.toFixed(2)}</td>
+                        <td><button class="btn-del" data-id="${id}"><i class="fa-solid fa-trash"></i></button></td>
+                    `;
+                    tableBody.prepend(tr);
+                });
+
+                document.getElementById('total-produtos').innerText = totalProdutos;
+                document.getElementById('valor-estoque').innerText = `R$ ${valorEstoque.toFixed(2)}`;
+                document.getElementById('produtos-baixo').innerText = estoqueBaixo;
+
+                totaisAtuais.produtos = totalProdutos;
+                totaisAtuais.estoque = valorEstoque;
+                atualizarTicker(totaisAtuais.receitas, totaisAtuais.despesas, totaisAtuais.receitas - totaisAtuais.despesas, totalProdutos, valorEstoque);
+
+                tableBody.querySelectorAll('.btn-del[data-id]').forEach(btn => {
+                    btn.onclick = async () => { await deleteDoc(doc(db, "produtos", btn.getAttribute('data-id'))); };
+                });
+            }, (error) => {
+                console.error("Erro no banco de produtos:", error);
+            });
+        }
+
+        document.getElementById('produto-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await addDoc(produtosRef, {
+                nome: document.getElementById('produto-nome').value,
+                categoria: document.getElementById('produto-categoria').value,
+                preco: document.getElementById('produto-preco').value,
+                estoque: document.getElementById('produto-estoque').value,
+                contexto: contextoAtual,
+                criadoEm: new Date()
+            });
+            document.getElementById('produto-form').reset();
+        });
+
+        conectarBancoRealtime();
+        conectarProdutos();
+    </script>
+</body>
+</html>

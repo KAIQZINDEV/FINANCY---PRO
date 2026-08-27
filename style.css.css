@@ -1,0 +1,551 @@
+/* =========================================================
+   FINANCPROK — DESIGN SYSTEM
+   Conceito: terminal financeiro profissional (HUD de mercado)
+   Cores: grafite azulado + sinal menta/âmbar
+   Tipos: Space Grotesk (display) / JetBrains Mono (números) / Inter (corpo)
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+:root {
+    --bg-void: #04070b;
+    --bg-panel: #0a1119;
+    --bg-panel-alt: #0e1620;
+    --bg-input: #101a26;
+    --line: rgba(0, 229, 199, 0.10);
+    --line-strong: rgba(0, 229, 199, 0.28);
+
+    --text-hi: #e8f1f5;
+    --text-mid: #7c8ea1;
+    --text-low: #3f4d5e;
+
+    --signal-mint: #00e5c7;
+    --signal-mint-soft: rgba(0, 229, 199, 0.12);
+    --signal-amber: #ffb020;
+    --signal-amber-soft: rgba(255, 176, 32, 0.12);
+    --positive: #35d07f;
+    --positive-soft: rgba(53, 208, 127, 0.12);
+    --negative: #ff4d6d;
+    --negative-soft: rgba(255, 77, 109, 0.12);
+
+    --font-display: 'Space Grotesk', 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+body {
+    background:
+        radial-gradient(circle at 50% -10%, rgba(0, 229, 199, 0.06) 0%, transparent 55%),
+        var(--bg-void);
+    color: var(--text-mid);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+::selection { background: var(--signal-mint); color: #04070b; }
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-thumb { background: var(--bg-input); }
+::-webkit-scrollbar-track { background: transparent; }
+
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* =========================================================
+   FRAME HUD — cantos estilo terminal para os painéis
+========================================================= */
+.panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    position: relative;
+    padding: 1.6rem 1.8rem;
+}
+
+.panel::before, .panel::after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: var(--signal-mint);
+    opacity: 0.55;
+}
+.panel::before { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; }
+.panel::after { bottom: -1px; right: -1px; border-bottom: 2px solid; border-right: 2px solid; }
+
+/* =========================================================
+   TOPO — LOGO / NAV / CONTEXTO
+========================================================= */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding: 1.1rem 2rem;
+    border-bottom: 1px solid var(--line);
+    background: rgba(10, 17, 25, 0.85);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--text-hi);
+    letter-spacing: 0.5px;
+}
+
+.brand .dot-pulse {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--signal-mint);
+    box-shadow: 0 0 0 0 rgba(0,229,199,0.6);
+    animation: pulse 2s infinite;
+}
+
+.brand .pro-tag {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--bg-void);
+    background: var(--signal-mint);
+    padding: 2px 7px;
+    border-radius: 3px;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0,229,199,0.55); }
+    70% { box-shadow: 0 0 0 8px rgba(0,229,199,0); }
+    100% { box-shadow: 0 0 0 0 rgba(0,229,199,0); }
+}
+
+.nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-input);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 3px;
+}
+
+.nav-tab {
+    background: none;
+    border: none;
+    color: var(--text-mid);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.55rem 1.1rem;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+}
+
+.nav-tab:hover { color: var(--text-hi); }
+
+.nav-tab.active {
+    background: var(--signal-mint-soft);
+    color: var(--signal-mint);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+}
+
+.context-toggle {
+    display: flex;
+    background: var(--bg-input);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 3px;
+}
+
+.context-btn {
+    background: none;
+    border: none;
+    color: var(--text-mid);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.5rem 1rem;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.context-btn:hover { color: var(--text-hi); }
+
+.context-btn.active.pessoal { background: var(--signal-mint); color: #04070b; }
+.context-btn.active.empresa { background: var(--signal-amber); color: #04070b; }
+
+#status-sync {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-mid);
+    border: 1px solid var(--line);
+    padding: 6px 12px;
+    border-radius: 4px;
+    background: var(--bg-input);
+}
+
+/* =========================================================
+   TICKER — faixa de indicadores rolantes (assinatura visual)
+========================================================= */
+.ticker-wrap {
+    width: 100%;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg-panel-alt);
+    padding: 0.6rem 0;
+}
+
+.ticker-track {
+    display: flex;
+    width: max-content;
+    animation: ticker-scroll 26s linear infinite;
+    gap: 3.5rem;
+}
+
+.ticker-wrap:hover .ticker-track { animation-play-state: paused; }
+
+@keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+
+.ticker-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-mid);
+    white-space: nowrap;
+}
+
+.ticker-item .lbl { color: var(--text-low); text-transform: uppercase; letter-spacing: 0.5px; }
+.ticker-item .val { color: var(--text-hi); font-weight: 700; }
+.ticker-item .val.up { color: var(--positive); }
+.ticker-item .val.down { color: var(--negative); }
+.ticker-item i { color: var(--signal-mint); font-size: 0.7rem; }
+
+/* =========================================================
+   CONTEÚDO
+========================================================= */
+.main-content {
+    padding: 2.2rem 2.4rem 3rem;
+    max-width: 1480px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+.view { display: none; flex-direction: column; gap: 1.4rem; animation: fadeUp 0.35s ease; }
+.view.active { display: flex; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.view-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.view-title h1 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    color: var(--text-hi);
+    font-weight: 700;
+}
+
+.view-title p {
+    font-size: 0.82rem;
+    color: var(--text-low);
+    font-family: var(--font-mono);
+}
+
+/* =========================================================
+   PAINÉIS DE INDICADORES
+========================================================= */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+}
+
+.stat-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stat-panel .stat-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.stat-panel .stat-label {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-low);
+    font-weight: 700;
+}
+
+.stat-panel .stat-icon {
+    width: 30px; height: 30px;
+    border-radius: 4px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    background: var(--bg-input);
+}
+
+.stat-panel.receita .stat-icon { color: var(--positive); background: var(--positive-soft); }
+.stat-panel.despesa .stat-icon { color: var(--negative); background: var(--negative-soft); }
+.stat-panel.saldo .stat-icon { color: var(--signal-mint); background: var(--signal-mint-soft); }
+.stat-panel.produtos .stat-icon { color: var(--signal-amber); background: var(--signal-amber-soft); }
+.stat-panel.estoque .stat-icon { color: var(--signal-mint); background: var(--signal-mint-soft); }
+.stat-panel.baixo .stat-icon { color: var(--negative); background: var(--negative-soft); }
+
+.stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--text-hi);
+}
+
+.stat-panel.receita .stat-value { color: var(--positive); }
+.stat-panel.despesa .stat-value { color: var(--negative); }
+
+/* =========================================================
+   FORMULÁRIOS
+========================================================= */
+.form-panel h3 {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    color: var(--text-hi);
+    margin-bottom: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-panel h3 i { color: var(--signal-mint); }
+.form-panel h3 .ctx-label { color: var(--signal-mint); font-family: var(--font-mono); font-size: 0.85rem; }
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.f-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 150px;
+}
+
+.f-group label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-low);
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.f-group input, .f-group select {
+    background: var(--bg-input);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 0.7rem 0.9rem;
+    color: var(--text-hi);
+    font-size: 0.86rem;
+    font-family: var(--font-mono);
+}
+
+.f-group input:focus, .f-group select:focus {
+    outline: none;
+    border-color: var(--signal-mint);
+    box-shadow: 0 0 0 3px var(--signal-mint-soft);
+}
+
+.btn-exec {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.4px;
+    border: none;
+    padding: 0.75rem 1.6rem;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    background: var(--signal-mint);
+    color: #04070b;
+    transition: all 0.15s ease;
+}
+.btn-exec:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+.btn-exec.amber { background: var(--signal-amber); }
+
+/* =========================================================
+   GRÁFICOS
+========================================================= */
+.chart-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+}
+
+.panel-head h3 {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    color: var(--text-hi);
+    font-weight: 700;
+}
+
+.seg-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-input);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 3px;
+}
+
+.seg-tab {
+    background: none; border: none;
+    color: var(--text-mid);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 0.35rem 0.7rem;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.seg-tab.active { background: var(--signal-mint-soft); color: var(--signal-mint); }
+
+.chart-canvas-wrap { position: relative; height: 300px; }
+.chart-canvas-wrap.small { height: 200px; }
+
+.dist-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+}
+
+.dist-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--text-mid);
+}
+
+.dist-row .sq { width: 8px; height: 8px; display: inline-block; margin-right: 8px; }
+.dist-row strong { color: var(--text-hi); }
+
+/* =========================================================
+   TABELAS
+========================================================= */
+.table-scroll { max-height: 360px; overflow-y: auto; }
+
+.grid-table { width: 100%; border-collapse: collapse; }
+
+.grid-table th {
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 0.63rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-low);
+    padding: 0.6rem 0.7rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.grid-table td {
+    padding: 0.75rem 0.7rem;
+    font-size: 0.82rem;
+    color: var(--text-mid);
+    border-bottom: 1px solid rgba(255,255,255,0.02);
+    font-family: var(--font-mono);
+}
+
+.grid-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.012); }
+.grid-table tbody tr:hover { background: var(--signal-mint-soft); }
+
+.v-up { color: var(--positive); font-weight: 700; }
+.v-down { color: var(--negative); font-weight: 700; }
+.v-low { color: var(--negative); font-weight: 700; }
+
+.chip {
+    font-family: var(--font-mono);
+    font-size: 0.63rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: var(--bg-input);
+    border: 1px solid var(--line);
+    color: var(--text-mid);
+}
+
+.btn-del {
+    background: none; border: none;
+    color: var(--text-low);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.btn-del:hover { color: var(--negative); }
+
+.empty-row {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-low);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+}
+.empty-row i { display: block; font-size: 1.4rem; margin-bottom: 0.5rem; opacity: 0.5; }
+
+/* =========================================================
+   RESPONSIVO
+========================================================= */
+@media (max-width: 1024px) {
+    .chart-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 860px) {
+    .topbar { flex-direction: column; align-items: stretch; gap: 0.8rem; }
+    .nav-tabs, .context-toggle { justify-content: center; }
+    .main-content { padding: 1.4rem; }
+    .form-row { flex-direction: column; align-items: stretch; }
+    .btn-exec { width: 100%; height: 46px; }
+}
