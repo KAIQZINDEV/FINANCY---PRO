@@ -2,7 +2,7 @@
 
 ![Status do Projeto](https://img.shields.io/badge/STATUS-ATIVO-00E5C7?style=for-the-badge)
 ![Tecnologia](https://img.shields.io/badge/STACK-HTML5%20%7C%20CSS3%20-101A26?style=for-the-badge)
-![UI Concept](https://img.shields.io/badge/DESIGN-HUD%20TERMINAL-FFB020?style=for-the-badge)
+
 
 O **FINANCY PRO** é um painel de gestão financeira e controle de estoque de alta performance. Inspirado em terminais profissionais de mercado.
 
